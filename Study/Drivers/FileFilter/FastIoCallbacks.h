@@ -1,0 +1,6 @@
+#ifndef FASTIO_CALLBACKS_H_
+#define FASTIO_CALLBACKS_H_
+
+
+
+#endif // FASTIO_CALLBACKS_H_

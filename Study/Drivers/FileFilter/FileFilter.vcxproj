@@ -94,9 +94,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DriverMain.c" />
+    <ClCompile Include="FastIoCallbacks.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DriverMain.h" />
+    <ClInclude Include="FastIoCallbacks.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

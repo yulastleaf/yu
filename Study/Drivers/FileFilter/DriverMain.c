@@ -94,7 +94,39 @@ DriverEntry(
         DriverObject->MajorFunction[IRP_MJ_FILE_SYSTEM_CONTROL] = SfFsControl;
         DriverObject->MajorFunction[IRP_MJ_CLOSE] = sfCleanupClose;
 
+        PFAST_IO_DISPATCH fastIoDispatch;
+        fastIoDispatch = ExAllocatePoolWithTag(NonPagedPool, sizeof(FAST_IO_DISPATCH), SFLT_POOL_TAG);
+        if (!fastIoDispatch) {
+            // 分配失败的情况，删除我们先生成的控制设备IoDeleteDevice( gSFilterControlDeviceObject ); return STATUS_INSUFFICIENT_RESOURCES;
+        }
+        // 内存清零。
+        RtlZeroMemory(fastIoDispatch, sizeof(FAST_IO_DISPATCH)); fastIoDispatch->SizeOfFastIoDispatch = sizeof(FAST_IO_DISPATCH);
 
+        //我们过滤以下所有的函数:
+        fastIoDispatch->FastIoCheckIfPossible = SfFastIoCheckIfPossible; 
+        fastIoDispatch->FastIoRead = SfFastIoRead;
+        fastIoDispatch->FastIoWrite = SfFastIoWrite;
+        fastIoDispatch->FastIoQueryBasicInfo = SfFastIoQueryBasicInfo; 
+        fastIoDispatch->FastIoQueryStandardInfo = SfFastIoQueryStandardInfo; 
+        fastIoDispatch->FastIoLock = SfFastIoLock;
+        fastIoDispatch->FastIoUnlockSingle = SfFastIoUnlockSingle; 
+        fastIoDispatch->FastIoUnlockAll = SfFastIoUnlockAll; 
+        fastIoDispatch->FastIoUnlockAllByKey = SfFastIoUnlockAllByKey; 
+        fastIoDispatch->FastIoDeviceControl = SfFastIoDeviceControl; 
+        fastIoDispatch->FastIoDetachDevice = SfFastIoDetachDevice;
+        fastIoDispatch->FastIoQueryNetworkOpenInfo = SfFastIoQueryNetworkOpenInfo; 
+        fastIoDispatch->MdlRead = SfFastIoMdlRead;
+        fastIoDispatch->MdlReadComplete = SfFastIoMdlReadComplete; 
+        fastIoDispatch->PrepareMdlWrite = SfFastIoPrepareMdlWrite; 
+        fastIoDispatch->MdlWriteComplete = SfFastIoMdlWriteComplete; 
+        fastIoDispatch->FastIoReadCompressed = SfFastIoReadCompressed; 
+        fastIoDispatch->FastIoWriteCompressed = SfFastIoWriteCompressed;
+        fastIoDispatch->MdlReadCompleteCompressed = SfFastIoMdlReadCompleteCompressed; 
+        fastIoDispatch->MdlWriteCompleteCompressed = SfFastIoMdlWriteCompleteCompressed;
+
+        fastIoDispatch->FastIoQueryOpen = SfFastIoQueryOpen;
+        // 最后指定给 DriverObject.
+        DriverObject->FastIoDispatch = fastIoDispatch;
 
     } while (0);
 
